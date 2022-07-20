@@ -20,39 +20,17 @@ import ForgeUI, {
     Tooltip,
     useProductContext,
     useState } from "@forge/ui";
+import {fetchCommentsForIssue, fetchProjects} from "./apiservice";
 
-import api, { route } from "@forge/api";
-const fetchCommentsForIssue = async (issueIdOrKey) => {
-    const res = await api
-        .asUser()
-        .requestJira(route`/rest/api/3/issue/${issueIdOrKey}/comment`);
 
-    const data = await res.json();
-    return data.comments;
-};
-
-const exampleCodeBlock = `  // React Component
-    class HelloMessage extends React.Component {
-      render() {
-        return (
-          <div>
-            Hello {this.props.name}
-          </div>
-        );
-      }
-    }
-
-    ReactDOM.render(
-      <HelloMessage name="Taylor" />,
-      mountNode
-    );
-  `;
 
 const App = () => {
     const context = useProductContext();
     const [comments] = useState(async () => await fetchCommentsForIssue(context.platformContext.issueKey));
+    const [projects] = useState(async () => await fetchProjects());
 
     console.log(`Number of comments on this issue: ${comments.length}`);
+    console.log(`The name o fthe first project is: ${projects.values[0].name}`);
     // uso de Code
     // <Code text={exampleCodeBlock} language="javascript" />
     const [formState, setFormState] = useState(undefined);
@@ -68,6 +46,11 @@ const App = () => {
   return (
     <Fragment>
         <Tabs>
+            <Tab label="Proyectos">
+                <Text>
+                    Proyectos {projects.values[0].name}
+                </Text>
+            </Tab>
             <Tab label="Tab 1">
                 <Text>
                     Number of comments on this issue: {comments.length}
@@ -116,6 +99,7 @@ const App = () => {
                     />
                 </Tooltip>
             </Tab>
+
         </Tabs>
 
 
